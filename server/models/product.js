@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const todoSchema = new mongoose.Schema({
+const productSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -19,6 +19,7 @@ const todoSchema = new mongoose.Schema({
   },
 });
 
-module.exports = {
-  Todo: mongoose.model("Todo", todoSchema),
-};
+
+
+
+module.exports = mongoose.model("Product", productSchema);

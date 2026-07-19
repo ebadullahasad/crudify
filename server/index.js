@@ -2,14 +2,16 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
-const todoRoutes = require("./routes/todo.routes");
+const todoRoutes = require("./routes/productRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
 app.use(express.json());
+app.use("/api/user", userRoutes);
 
-// Mount all todo routes under /api/todos
-app.use("/api/todos", todoRoutes);
+// Mount all product routes under /api/products
+app.use("/api/products", todoRoutes);
 
 // 404 — runs if no route above matched
 app.use((req, res) => {
