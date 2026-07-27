@@ -1,34 +1,52 @@
 require("dotenv").config();
 
 const express = require("express");
-const mongoose = require("mongoose");
-const todoRoutes = require("./routes/productRoutes");
-const userRoutes = require("./routes/userRoutes");
+const session = require("express-session");
+const { MongoStore } = require("connect-mongo");
+
+const connectDB = require("./config/db");
+const { authenticateUser } = require("./middlewares/auth");
+const { notFound, errorHandler } = require("./middlewares/errorHandler");
+
+const authRoutes = require("./routes/authRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
 app.use(express.json());
-app.use("/api/user", userRoutes);
 
-// Mount all product routes under /api/products
-app.use("/api/products", todoRoutes);
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    rolling: true,
+    store: new MongoStore({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: "sessions",
+      ttl: 60 * 5,
+    }),
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 5,
+      // secure: true,   // enable in production over HTTPS
+    },
+  })
+);
 
-// 404 — runs if no route above matched
-app.use((req, res) => {
-  res.status(404).json({ error: "Not Found", path: req.originalUrl });
-});
+// Public routes — no auth required
+app.use("/api/auth", authRoutes);
 
-// Error handler — runs only when something throws
-app.use((err, req, res, next) => {
-  const status = err.status || 500;
-  res.status(status).json({ error: err.message || "Internal Server Error" });
-});
+// Protected routes — require a valid session
+app.use("/api/products", authenticateUser, productRoutes);
 
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("✓ Connected to database!"))
-  .catch((err) => console.log("✗ Connection failed:", err.message));
+// Fallbacks (must be last)
+app.use(notFound);
+app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+connectDB().then(() => {
+  app.listen(3000, () => {
+    console.log("Server is running on port 3000");
+  });
 });
