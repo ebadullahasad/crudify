@@ -1,155 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
-  font-family: "Poppins";
-}
-
-@layer utilities {
-  .gradient {
-    @apply hover:bg-gradient-to-t hover:bg-[#5454D4] from-[#42427c];
-  }
-  .mainheading {
-    @apply lg:text-[101px] md:text-[80px] text-[40px] lg:leading-[120px] md:leading-[92px] sm:leading-[45px];
-  }
-  .subheading {
-    @apply lg:text-[90px] md:text-[50px] text-[30px] lg:leading-[110px] md:leading-[82px] sm:leading-[38px];
-  }
-  .preheading {
-    @apply lg:text-[56px] md:text-[32px] text-[22px] lg:leading-[64px] md:leading-[44px] leading-[32px];
-  }
-  .heading1 {
-    @apply lg:text-[64px] md:text-[35px] text-[22px] lg:leading-[70px] md:leading-[50px] sm:leading-[30px];
-  }
-  .heading2 {
-    @apply lg:text-[50px] md:text-[30px] text-[20px] lg:leading-[68px] md:leading-[48px] sm:leading-[24px];
-  }
-  .text1 {
-    @apply lg:text-[48px] md:text-[34px] text-[22px] lg:leading-[57px] md:leading-[38px] sm:leading-[24px];
-  }
-  .text2 {
-    @apply lg:text-[42px] md:text-[28px] text-[20px] lg:leading-[50px] md:leading-[34px] sm:leading-[22px];
-  }
-  .text3 {
-    @apply lg:text-[35px] md:text-[28px] text-[20px] lg:leading-[50px] md:leading-[32px] sm:leading-[20px];
-  }
-  .text4 {
-    @apply lg:text-[30px] md:text-[24px] text-[18px] lg:leading-[36px] md:leading-[28px] sm:leading-[18px];
-  }
-  .text5 {
-    @apply lg:text-[28px] md:text-[22px] text-[17px] lg:leading-[33px] md:leading-[24px] sm:leading-[15px];
-  }
-  .text6 {
-    @apply lg:text-[26px] md:text-[21px] text-[17px] lg:leading-[35px] md:leading-[28px] leading-[18px];
-  }
-
-  .text7 {
-    @apply lg:text-[24px] md:text-[19px] text-[16px] lg:leading-[28px] md:leading-[24px] leading-[17px];
-  }
-  .text8 {
-    @apply lg:text-[20px] md:text-[16px] text-[12px] lg:leading-[28px] md:leading-[22px] leading-[16px];
-  }
-  .text9 {
-    @apply lg:text-[18px] md:text-[15px] text-[12px] lg:leading-[20px] md:leading-[16px] sm:leading-[13px];
-  }
-  .text10 {
-    @apply lg:text-[16px] md:text-[14px] text-[12px] lg:leading-[21px] md:leading-[18px] sm:leading-[14px];
-  }
-  .text11 {
-    @apply lg:text-[15px] md:text-[13px] text-[11px] lg:leading-[21px] md:leading-[18px] leading-[14px];
-  }
-  .text12 {
-    @apply lg:text-[14px] md:text-[12px] text-[10px] lg:leading-[19px] md:leading-[16px] leading-[12px];
-  }
-  .text13 {
-    @apply lg:text-[13px] md:text-[11px] text-[9px] lg:leading-[15px] md:leading-[10px] leading-[8px];
-  }
-
-  select option {
-    @apply bg-darkgray2 text-lightgray2;
-  }
-
-  select:focus > option:checked {
-    @apply bg-darkgray3;
-    @apply lg:text-[14px] md:text-[12px] text-[10px] lg:leading-[19px] md:leading-[16px] sm:leading-[12px];
-  }
-
-  .firstinner-ul {
-    list-style-type: none;
-  }
-
-  .firstinner-ul li::before {
-    content: "•";
-    margin-right: 8px;
-    color: #fff;
-  }
-
-  .serviceinner-ul {
-    list-style-type: none;
-  }
-
-  .serviceinner-ul li::before {
-    content: "•";
-    margin-right: 8px;
-    color: #e1c45b;
-  }
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #222;
-}
-
-/* 🛠️ Extra Fix: Make scrollbar visible on small screens */
-@media (max-width: 767px) {
-  .custom-scrollbar {
-    overflow-y: auto !important; /* Ensures scrolling */
-  }
-}
-
-/* Ensures the 3D effect works smoothly */
-.card-container {
-  perspective: 1000px; /* This adds depth to the 3D space */
-}
-
-/* Card flip animation */
-.card {
-  transform-style: preserve-3d; /* Ensures child elements are rendered in 3D */
-  transition: transform 0.5s ease-in-out; /* Smooth flip transition */
-}
-
-.card:hover {
-  transform: rotateY(180deg); /* Rotate the card on hover */
-}
-
-/* Front and Back faces */
-.front,
-.back {
-  backface-visibility: hidden; /* Hide the back side when facing away */
-}
-
-.front {
-  position: absolute;
-  width: 100%;
+html,
+body,
+#root {
   height: 100%;
 }
 
-.back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  transform: rotateY(180deg); /* Back face should start rotated */
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
-.scrollbar-hide {
-  scrollbar-width: none; /* For Firefox */
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none; /* For Chrome, Safari, and Opera */
+/* Nicer focus rings globally */
+:focus-visible {
+  @apply outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-white;
 }
