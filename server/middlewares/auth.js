@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const { setUserCookie } = require("../controllers/authController");
 
 async function authenticateUser(req, res, next) {
   if (!req.session.userId) {
@@ -9,6 +10,8 @@ async function authenticateUser(req, res, next) {
   if (!user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
+
+  setUserCookie(res, user);
 
   req.user = user;
   next();
