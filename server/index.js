@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const cors = require("cors");
 const session = require("express-session");
 const { MongoStore } = require("connect-mongo");
 
@@ -12,6 +13,13 @@ const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:5173", 
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 
@@ -32,7 +40,7 @@ app.use(
       maxAge: 1000 * 60 * 5,
       // secure: true,   // enable in production over HTTPS
     },
-  })
+  }),
 );
 
 // Public routes — no auth required

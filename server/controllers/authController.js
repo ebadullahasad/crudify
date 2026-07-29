@@ -1,5 +1,28 @@
-const user = require("../models/user");
 const User = require("../models/user");
+
+// Same TTL as the session cookie (matches rolling: true + 5-min sliding TTL)
+const USER_COOKIE_MAX_AGE = 1000 * 60 * 5;
+
+const setUserCookie = (res, user) => {
+  res.cookie(
+    "crudify_user",
+    JSON.stringify({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    }),
+    {
+      httpOnly: false,
+      sameSite: "lax",
+      maxAge: USER_COOKIE_MAX_AGE,
+    },
+  );
+};
+
+const clearAuthCookies = (res) => {
+  res.clearCookie("connect.sid");
+  res.clearCookie("crudify_user");
+};
 
 const signupUser = async (req, res) => {
   const { name, email, password } = req.body || {};
@@ -10,25 +33,22 @@ const signupUser = async (req, res) => {
     err.status = 400;
     throw err;
   }
-const existing = await User.findOne({ $or: [{ name }, { email }] });
-if(existing) {
-  let fields = [];
-  
-  if(existing.email === email) fields.push("email");
-  if(existing.name === name) fields.push("name");
-  
-  const field = fields.join(" and ");
-  const err = new Error(`${field} already exists`);
-  err.status = 409;
-  throw err;
-}
+
+  const existing = await User.findOne({ $or: [{ name }, { email }] });
+  if (existing) {
+    const fields = [];
+    if (existing.email === email) fields.push("email");
+    if (existing.name === name) fields.push("name");
+    const err = new Error(`${fields.join(" and ")} already exists`);
+    err.status = 409;
+    throw err;
+  }
+
   const newUser = new User({ name, email, password });
   await newUser.save();
   res
     .status(201)
     .json({ success: true, message: "User registered successfully" });
-  
-  
 };
 
 const loginUser = async (req, res) => {
@@ -52,22 +72,28 @@ const loginUser = async (req, res) => {
   }
 
   req.session.userId = user._id;
+  setUserCookie(res, user);
 
-  res.status(200).json({ success: true, message: "Login successful" });
+  res.status(200).json({
+    success: true,
+    message: "Login successful",
+    user: { id: user._id, name: user.name, email: user.email },
+  });
 };
 
 const logoutUser = async (req, res) => {
   if (!req.session) {
+    clearAuthCookies(res);
     return res
       .status(200)
       .json({ success: true, message: "Already logged out" });
   }
 
-  await new Promise((res, rej) => {
-    req.session.destroy((err) => (err ? rej(err) : res()));
+  await new Promise((resolve, reject) => {
+    req.session.destroy((err) => (err ? reject(err) : resolve()));
   });
 
-  res.clearCookie("connect.sid"); // default cookie name for express-session
+  clearAuthCookies(res);
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
@@ -75,4 +101,5 @@ module.exports = {
   signupUser,
   loginUser,
   logoutUser,
+  setUserCookie, // exported so middleware can refresh on each request
 };
