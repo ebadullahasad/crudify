@@ -9,14 +9,20 @@ const connectDB = require("./config/db");
 const { authenticateUser } = require("./middlewares/auth");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 
+const { apiLimiter } = require("./middlewares/rateLimit");
+const { isProd, cookieBase, AUTH_TTL_MS } = require("./config/cookies");
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
+const PORT = process.env.PORT || 8000;
+
+if (isProd) app.set("trust proxy", 1);
+
 app.use(
   cors({
-    origin: "http://localhost:5173", 
+    origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
     credentials: true,
   }),
 );
@@ -35,13 +41,14 @@ app.use(
       ttl: 60 * 5,
     }),
     cookie: {
+      ...cookieBase,
       httpOnly: true,
-      sameSite: "lax",
-      maxAge: 1000 * 60 * 5,
-      // secure: true,   // enable in production over HTTPS
+      maxAge: AUTH_TTL_MS,
     },
   }),
 );
+
+app.use("/api", apiLimiter);
 
 // Public routes — no auth required
 app.use("/api/auth", authRoutes);
@@ -54,7 +61,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 connectDB().then(() => {
-  app.listen(3000, () => {
-    console.log("Server is running on port 3000");
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
 });

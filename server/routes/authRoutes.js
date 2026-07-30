@@ -5,9 +5,10 @@ const {
   loginUser,
   logoutUser,
 } = require("../controllers/authController");
+const { loginLimiter, signupLimiter } = require("../middlewares/rateLimit");
 
-router.post("/signup", signupUser);
-router.post("/login", loginUser);
+router.post("/signup", signupLimiter, signupUser);
+router.post("/login", loginLimiter, loginUser);
 router.post("/logout", logoutUser);
 
 module.exports = router;

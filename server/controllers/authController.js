@@ -1,7 +1,5 @@
 const User = require("../models/user");
-
-// Same TTL as the session cookie (matches rolling: true + 5-min sliding TTL)
-const USER_COOKIE_MAX_AGE = 1000 * 60 * 5;
+const { cookieBase, AUTH_TTL_MS } = require("../config/cookies");
 
 const setUserCookie = (res, user) => {
   res.cookie(
@@ -12,16 +10,16 @@ const setUserCookie = (res, user) => {
       email: user.email,
     }),
     {
+      ...cookieBase,
       httpOnly: false,
-      sameSite: "lax",
-      maxAge: USER_COOKIE_MAX_AGE,
+      maxAge: AUTH_TTL_MS,
     },
   );
 };
 
 const clearAuthCookies = (res) => {
-  res.clearCookie("connect.sid");
-  res.clearCookie("crudify_user");
+  res.clearCookie("connect.sid", { ...cookieBase, httpOnly: true });
+  res.clearCookie("crudify_user", { ...cookieBase, httpOnly: false });
 };
 
 const signupUser = async (req, res) => {
